@@ -58,7 +58,6 @@ public function update(Request $request, Product $product)
             'name'        => $data['name'],
             'description' => $data['description'] ?? '',
             'price'       => $data['price'],
-            'image'       => $data['image'] ?? '',
             'visible'     => $data['visible']
         ]);
 
