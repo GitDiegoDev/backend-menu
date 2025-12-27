@@ -30,8 +30,7 @@ class PromoController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
+            
         ]);
 
         if ($validator->fails()) {
