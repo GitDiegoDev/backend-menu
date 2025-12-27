@@ -13,8 +13,6 @@ return new class extends Migration
         $table->string('title');
         $table->text('description')->nullable();
         $table->decimal('price', 10, 2)->nullable();
-        $table->time('start_time'); // ← ¿Existe?
-        $table->time('end_time');   // ← ¿Existe?
         $table->string('day_of_week')->default('todos');
         $table->boolean('active')->default(true);
         $table->string('image')->nullable();
