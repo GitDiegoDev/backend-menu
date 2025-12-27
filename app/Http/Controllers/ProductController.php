@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
+    // Método para la API que devuelve todos los productos con sus relaciones
+public function all()
+{
+    $products = Product::with('category', 'variants')->get();
+    return response()->json($products);
+}
     public function index()
     {
         $products = Product::with('category')->get();

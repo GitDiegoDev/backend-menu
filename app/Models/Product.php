@@ -17,11 +17,14 @@ class Product extends Model
         'visible'
     ];
 
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
- public function variants()
+     // Relación con la categoría
+public function category()
+{
+    return $this->belongsTo(Category::class);
+}
+
+// Relación con las variantes
+public function variants()
 {
     return $this->hasMany(ProductVariant::class);
 }
