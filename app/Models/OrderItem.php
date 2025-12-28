@@ -8,15 +8,13 @@ class OrderItem extends Model
 {
     protected $table = 'order_items';
 
-    protected $fillable = [
-        'order_id',
-        'product_id',
-        'product_name',
-        'quantity',
-        'price',
-        'subtotal'
-    ];
-
+     protected $fillable = [
+    'order_id',
+    'product_id',
+    'product_name',
+    'quantity',
+    'price',
+];
     public $timestamps = true;
 }
 

@@ -24,25 +24,22 @@ class OrderController extends Controller
     try {
         // 1. Crear el pedido
         $order = Order::create([
-            'items' => json_encode($data['items']),
-            'total' => $data['total'],
-            'delivery_type' => $data['delivery_type'],
-            'address' => $data['address'] ?? null,
-        ]);
-
+        'total' => $data['total'],
+        'delivery_type' => $data['delivery_type'],
+        'address' => $data['address'] ?? null,
+    ]);
         // 2. Crear los items
         foreach ($data['items'] as $item) {
 
     DB::table('order_items')->insert([
-        'order_id'     => $order->id,
-        'product_id'   => $item['product_id'] ?? null,
-        'product_name' => $item['name'], // CAMBIO CLAVE
-        'price'        => $item['price'],
-        'quantity'     => $item['quantity'] ?? 1,
-        'subtotal'     => ($item['price'] * ($item['quantity'] ?? 1)),
-        'created_at'   => now(),
-        'updated_at'   => now(),
-    ]);
+    'order_id'     => $order->id,
+    'product_id'   => $item['product_id'] ?? null,
+    'product_name' => $item['name'],
+    'price'        => $item['price'],
+    'quantity'     => $item['quantity'] ?? 1,
+    'created_at'   => now(),
+    'updated_at'   => now(),
+]);
 }
 
         DB::commit();
