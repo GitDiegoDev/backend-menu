@@ -33,17 +33,17 @@ class OrderController extends Controller
         // 2. Crear los items
         foreach ($data['items'] as $item) {
 
-            DB::table('order_items')->insert([
-                'order_id'  => $order->id,
-                'product_id'=> $item['product_id'] ?? null, // promos pueden ser null
-                'name'      => $item['name'],
-                'price'     => $item['price'],
-                'quantity'  => $item['quantity'] ?? 1,
-                'variant'   => $item['variant'] ?? null,
-                'created_at'=> now(),
-                'updated_at'=> now(),
-            ]);
-        }
+    DB::table('order_items')->insert([
+        'order_id'     => $order->id,
+        'product_id'   => $item['product_id'] ?? null,
+        'product_name' => $item['name'], // CAMBIO CLAVE
+        'price'        => $item['price'],
+        'quantity'     => $item['quantity'] ?? 1,
+        'subtotal'     => ($item['price'] * ($item['quantity'] ?? 1)),
+        'created_at'   => now(),
+        'updated_at'   => now(),
+    ]);
+}
 
         DB::commit();
 
