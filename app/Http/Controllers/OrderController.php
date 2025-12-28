@@ -9,18 +9,16 @@ class OrderController extends Controller
 {
     public function store(Request $request)
     {
-        // validar
         $data = $request->validate([
-            'items' => 'required|array',
             'delivery_type' => 'required|string',
-            'address' => 'nullable|string'
+            'address' => 'nullable|string',
+            'total' => 'required|numeric',
         ]);
 
-        // guardar
         $order = Order::create([
-            'items' => json_encode($data['items']),
             'delivery_type' => $data['delivery_type'],
-            'address' => $data['address'] ?? null
+            'address' => $data['address'] ?? null,
+            'total' => $data['total'],
         ]);
 
         return response()->json([
