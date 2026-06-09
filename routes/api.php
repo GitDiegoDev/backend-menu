@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\PromoController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\SiteConfigController;
+use App\Http\Controllers\Api\FidelizacionController;
 
 // Autenticación
 Route::post('/login', [AuthController::class, 'login']);
@@ -44,6 +45,11 @@ Route::post('/orders', [OrderController::class, 'store']);
 
 // Rutas de configuración del sitio
 Route::get('site-config', [SiteConfigController::class, 'index']); // PÚBLICO para que cargue
+
+// Rutas de fidelización
+Route::get('/clientes/{telefono}', [FidelizacionController::class, 'show']);
+Route::post('/clientes/pedido', [FidelizacionController::class, 'registrarPedido']);
+Route::post('/clientes/reclamar', [FidelizacionController::class, 'reclamarRecompensa']);
 
 // Solo POST requiere autenticación
 Route::middleware('auth:sanctum')->group(function () {
