@@ -14,6 +14,7 @@ class StorePedidoRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'pedido_uuid' => 'required|string',
             'nombre' => 'required|string|max:100',
             'telefono' => 'required|string|max:20',
         ];
