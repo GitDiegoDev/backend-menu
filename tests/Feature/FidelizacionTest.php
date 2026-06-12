@@ -27,8 +27,18 @@ class FidelizacionTest extends TestCase
             });
         }
 
-        // Limpiar la tabla antes de cada prueba
+        if (!Schema::hasTable('pedidos_fidelizacion')) {
+            Schema::create('pedidos_fidelizacion', function ($table) {
+                $table->id();
+                $table->string('pedido_uuid')->unique();
+                $table->string('telefono');
+                $table->timestamp('fecha_creacion')->nullable();
+            });
+        }
+
+        // Limpiar las tablas antes de cada prueba
         Cliente::truncate();
+        \App\Models\PedidoFidelizacion::truncate();
     }
 
     public function test_can_identify_client_by_phone()
@@ -67,6 +77,7 @@ class FidelizacionTest extends TestCase
     public function test_can_register_pedido_for_new_client()
     {
         $response = $this->postJson('/api/clientes/pedido', [
+            'pedido_uuid' => 'order-1',
             'nombre' => 'Diego',
             'telefono' => '3764123456'
         ]);
@@ -98,6 +109,7 @@ class FidelizacionTest extends TestCase
         ]);
 
         $response = $this->postJson('/api/clientes/pedido', [
+            'pedido_uuid' => 'order-2',
             'nombre' => 'Diego',
             'telefono' => '3764123456'
         ]);
@@ -116,6 +128,7 @@ class FidelizacionTest extends TestCase
         ]);
 
         $response = $this->postJson('/api/clientes/pedido', [
+            'pedido_uuid' => 'order-3',
             'nombre' => 'Diego',
             'telefono' => '3764123456'
         ]);
@@ -173,5 +186,32 @@ class FidelizacionTest extends TestCase
                 'success' => false,
                 'message' => 'No hay recompensas disponibles para reclamar'
             ]);
+    }
+
+    public function test_prevents_duplicate_pedido_uuid()
+    {
+        $response1 = $this->postJson('/api/clientes/pedido', [
+            'pedido_uuid' => 'duplicate-order',
+            'nombre' => 'Diego',
+            'telefono' => '3764123456'
+        ]);
+
+        $response1->assertStatus(200)
+            ->assertJsonPath('data.sellos_actuales', 1);
+
+        $response2 = $this->postJson('/api/clientes/pedido', [
+            'pedido_uuid' => 'duplicate-order',
+            'nombre' => 'Diego',
+            'telefono' => '3764123456'
+        ]);
+
+        $response2->assertStatus(400)
+            ->assertJson([
+                'success' => false,
+                'message' => 'El pedido ya ha sido procesado'
+            ]);
+
+        // Verificar que solo tiene 1 sello
+        $this->assertEquals(1, Cliente::where('telefono', '3764123456')->first()->sellos_actuales);
     }
 }

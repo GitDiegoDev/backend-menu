@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ReclamarRecompensaRequest;
 use App\Http\Requests\StorePedidoRequest;
 use App\Models\Cliente;
+use App\Models\PedidoFidelizacion;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -50,14 +51,27 @@ class FidelizacionController extends Controller
     public function registrarPedido(StorePedidoRequest $request): JsonResponse
     {
         return DB::transaction(function () use ($request) {
+            // Verificar si el pedido ya fue procesado
+            $pedidoExistente = PedidoFidelizacion::where('pedido_uuid', $request->pedido_uuid)->first();
+            if ($pedidoExistente) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El pedido ya ha sido procesado'
+                ], 400);
+            }
+
+            // Registrar el pedido para evitar duplicados
+            PedidoFidelizacion::create([
+                'pedido_uuid' => $request->pedido_uuid,
+                'telefono' => $request->telefono,
+            ]);
+
             $cliente = Cliente::firstOrCreate(
                 ['telefono' => $request->telefono],
                 ['nombre' => $request->nombre]
             );
 
-            // Si el cliente ya existía, pero se envía un nombre diferente, podrías actualizarlo opcionalmente
             // Según requerimientos, si no existe se crea con 1 sello. Si existe se incrementa en 1.
-
             $cliente->sellos_actuales += 1;
 
             if ($cliente->sellos_actuales >= 10) {
