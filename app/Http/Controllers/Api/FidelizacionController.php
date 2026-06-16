@@ -71,15 +71,20 @@ class FidelizacionController extends Controller
                 ['nombre' => $request->nombre]
             );
 
-            // Según requerimientos, si no existe se crea con 1 sello. Si existe se incrementa en 1.
-            $cliente->sellos_actuales += 1;
+            $hoy = now()->toDateString();
 
-            if ($cliente->sellos_actuales >= 10) {
-                $cliente->sellos_actuales = 0;
-                $cliente->premios_disponibles += 1;
+            // Solo otorgar sello si no ha recibido uno hoy
+            if (!$cliente->fecha_ultimo_sello || $cliente->fecha_ultimo_sello->toDateString() !== $hoy) {
+                $cliente->sellos_actuales += 1;
+                $cliente->fecha_ultimo_sello = $hoy;
+
+                if ($cliente->sellos_actuales >= 10) {
+                    $cliente->sellos_actuales = 0;
+                    $cliente->premios_disponibles += 1;
+                }
+
+                $cliente->save();
             }
-
-            $cliente->save();
 
             return response()->json([
                 'success' => true,
