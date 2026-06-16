@@ -17,5 +17,10 @@ class Cliente extends Model
         'sellos_actuales',
         'premios_disponibles',
         'premios_canjeados',
+        'fecha_ultimo_sello',
+    ];
+
+    protected $casts = [
+        'fecha_ultimo_sello' => 'date',
     ];
 }

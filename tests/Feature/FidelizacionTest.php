@@ -22,6 +22,7 @@ class FidelizacionTest extends TestCase
                 $table->integer('sellos_actuales')->default(0);
                 $table->integer('premios_disponibles')->default(0);
                 $table->integer('premios_canjeados')->default(0);
+                $table->date('fecha_ultimo_sello')->nullable();
                 $table->timestamp('fecha_alta')->nullable();
                 $table->timestamp('fecha_actualizacion')->nullable();
             });
@@ -213,5 +214,51 @@ class FidelizacionTest extends TestCase
 
         // Verificar que solo tiene 1 sello
         $this->assertEquals(1, Cliente::where('telefono', '3764123456')->first()->sellos_actuales);
+    }
+
+    public function test_does_not_grant_stamp_if_already_received_today()
+    {
+        $fechaHoy = now()->toDateString();
+        Cliente::create([
+            'nombre' => 'Diego',
+            'telefono' => '3764123456',
+            'sellos_actuales' => 1,
+            'fecha_ultimo_sello' => $fechaHoy,
+        ]);
+
+        $response = $this->postJson('/api/clientes/pedido', [
+            'pedido_uuid' => 'order-today-2',
+            'nombre' => 'Diego',
+            'telefono' => '3764123456'
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.sellos_actuales', 1);
+
+        $this->assertEquals(1, Cliente::where('telefono', '3764123456')->first()->sellos_actuales);
+    }
+
+    public function test_grants_stamp_if_last_stamp_was_yesterday()
+    {
+        $fechaAyer = now()->subDay()->toDateString();
+        Cliente::create([
+            'nombre' => 'Diego',
+            'telefono' => '3764123456',
+            'sellos_actuales' => 1,
+            'fecha_ultimo_sello' => $fechaAyer,
+        ]);
+
+        $response = $this->postJson('/api/clientes/pedido', [
+            'pedido_uuid' => 'order-today',
+            'nombre' => 'Diego',
+            'telefono' => '3764123456'
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.sellos_actuales', 2);
+
+        $cliente = Cliente::where('telefono', '3764123456')->first();
+        $this->assertEquals(2, $cliente->sellos_actuales);
+        $this->assertEquals(now()->toDateString(), $cliente->fecha_ultimo_sello->toDateString());
     }
 }
