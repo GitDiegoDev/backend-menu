@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\SiteConfigController;
 use App\Http\Controllers\Api\FidelizacionController;
+use App\Http\Controllers\Api\ClienteController;
 
 // Autenticación
 Route::post('/login', [AuthController::class, 'login']);
@@ -27,6 +28,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/categories', [CategoryController::class, 'store']);
     Route::put('/categories/{category}', [CategoryController::class, 'update']);
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
+
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    // Gestión de clientes (Admin)
+    Route::get('/admin/clientes', [ClienteController::class, 'index']);
+    Route::get('/admin/clientes/{id}', [ClienteController::class, 'show'])->where('id', '[0-9]+');
+    Route::put('/admin/clientes/{id}/sellos', [ClienteController::class, 'updateSellos'])->where('id', '[0-9]+');
 });
 
 // Rutas públicas
@@ -47,7 +56,7 @@ Route::post('/orders', [OrderController::class, 'store']);
 Route::get('site-config', [SiteConfigController::class, 'index']); // PÚBLICO para que cargue
 
 // Rutas de fidelización
-Route::get('/clientes/{telefono}', [FidelizacionController::class, 'show']);
+Route::get('/clientes/{telefono}', [FidelizacionController::class, 'show'])->where('telefono', '[a-zA-Z0-9\-]+');
 Route::post('/clientes/pedido', [FidelizacionController::class, 'registrarPedido']);
 Route::post('/clientes/reclamar', [FidelizacionController::class, 'reclamarRecompensa']);
 

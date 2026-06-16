@@ -9,7 +9,12 @@ return new class extends Migration
     public function up()
     {
         Schema::table('promos', function (Blueprint $table) {
-            $table->dropColumn(['start_time', 'end_time']);
+            if (Schema::hasColumn('promos', 'start_time')) {
+                $table->dropColumn('start_time');
+            }
+            if (Schema::hasColumn('promos', 'end_time')) {
+                $table->dropColumn('end_time');
+            }
         });
     }
 
